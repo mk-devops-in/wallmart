@@ -1,0 +1,32 @@
+name: Send Email on Pull Request
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send email notification
+      env:
+        GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y msmtp
+
+        cat <<EOF > ~/.msmtprc
+        defaults
+        auth           on
+        tls            on
+        tls_trust_file /etc/ssl/certs/ca-certificates.crt
+        host           smtp.gmail.com
+        port           587
+        user           $GMAIL_USERNAME
+        password       $GMAIL_APP_PASSWORD
+        logfile        ~/.msmtp.log
+        EOF
+
+        echo -e "Subject: New Pull Request Created\n\nA new pull request has been created: ${{ github.event.pull_request.html_url }}" | msmtp tech.cloudera@gmail.com
