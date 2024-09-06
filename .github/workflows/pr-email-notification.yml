@@ -16,8 +16,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y msmtp
-        sudo touch ~/.msmtprc
-        sudo chmod 600 ~/.msmtprc
+      
 
         cat <<EOF > ~/.msmtprc
         defaults
@@ -31,4 +30,5 @@ jobs:
         logfile        ~/.msmtp.log
         EOF
 
+        sudo chmod 600 ~/.msmtprc
         echo -e "Subject: New Pull Request Created\n\nA new pull request has been created: ${{ github.event.pull_request.html_url }}" | msmtp tech.cloudera@gmail.com
